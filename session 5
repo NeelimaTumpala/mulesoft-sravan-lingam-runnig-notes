@@ -1,0 +1,51 @@
+--> transform msg code
+
+%dw 2.0
+var a={
+	"name" : "Neelima",
+	"Id" : 2,
+	"org" : "Mulesoft"
+}
+output application/json
+---
+
+"Hi " ++ a.name ++ " you are working for " ++ a.org
+
+
+--> code of transform msg if we send payload from postman
+
+%dw 2.0
+
+output application/json
+---
+
+"Hi " ++ payload.name ++ " you are working for " ++ payload.org
+
+
+--> If we want to send data data through both payload and queryParams
+
+%dw 2.0
+
+output application/json
+---
+
+"Hi " ++ payload.name ++ " you are working for " ++ attributes.queryParams.org
+
+--> if we want the output in xml formate then...
+%dw 2.0
+var a ={
+	"name" : "Neelima",
+	"Id" : [2,3,4]
+}
+output application/xml
+---
+hi : a
+
+<> Now the output will be 
+<?xml version='1.0' encoding='UTF-8'?>
+<hi>
+  <name>Neelima</name>
+  <Id>2</Id>
+  <Id>3</Id>
+  <Id>4</Id>
+</hi>
