@@ -1,0 +1,345 @@
+--> payload
+[
+ {
+"name" : "Sravan",
+"id" :123,
+"org" : "MuleSoft",
+"salary" : 234,
+"months" : 9
+ },
+ {
+"name" : "Mule",
+"id" :456,
+"org" : "XYZ",
+"salary" : 234,
+"months" : 12
+ },
+ {
+"name" : "Swag",
+"id" :786,
+"org" : "AWS",
+"salary" : 234,
+"months" : 4
+ }
+]
+
+--> Script
+%dw 2.0
+output application/xml
+---
+EmployeeDetails :
+{
+ (payload map {
+
+Employee @(id : $.id) :{
+ "Candidate" : "200\$",
+ "type" : $.org,
+ "UniqueId" : $.name ++ "-" ++ $.id ++ "-" ++ $.org,
+ "salary" : $.salary * $.months
+ }
+ })
+} 
+
+-->output
+<?xml version='1.0' encoding='UTF-8'?>
+<EmployeeDetails>
+  <Employee id="123">
+    <Candidate>200$</Candidate>
+    <type>MuleSoft</type>
+    <UniqueId>Sravan-123-MuleSoft</UniqueId>
+    <salary>2106</salary>
+  </Employee>
+  <Employee id="456">
+    <Candidate>200$</Candidate>
+    <type>XYZ</type>
+    <UniqueId>Mule-456-XYZ</UniqueId>
+    <salary>2808</salary>
+  </Employee>
+  <Employee id="786">
+    <Candidate>200$</Candidate>
+    <type>AWS</type>
+    <UniqueId>Swag-786-AWS</UniqueId>
+    <salary>936</salary>
+  </Employee>
+</EmployeeDetails>
+
+
+2.
+-->payload
+{
+ "name" : "sravan",
+ "id" :123,
+ "org" : {"company" : "MuleSoft"}
+
+ } 
+ 
+ -->script
+ %dw 2.0
+output application/xml
+---
+EmployeeDetails :
+payload mapObject (value, key, index) -> {
+
+ "what is key" : key
+
+}  
+
+
+-->output
+<?xml version='1.0' encoding='UTF-8'?>
+<EmployeeDetails>
+  <what is key>name</what is key>
+  <what is key>id</what is key>
+  <what is key>org</what is key>
+</EmployeeDetails>
+
+-->2.script
+%dw 2.0
+output application/xml
+---
+EmployeeDetails :
+payload mapObject (value, key, index) -> {
+
+ "what is index" : index,
+
+} 
+
+-->output
+<?xml version='1.0' encoding='UTF-8'?>
+<EmployeeDetails>
+  <what is index>0</what is index>
+  <what is index>1</what is index>
+  <what is index>2</what is index>
+</EmployeeDetails>
+
+-->3.script
+%dw 2.0
+output application/xml
+---
+EmployeeDetails :
+payload mapObject (value, key, index) -> {
+
+ "what is Value" : value,
+
+
+} 
+
+
+-->output
+<?xml version='1.0' encoding='UTF-8'?>
+<EmployeeDetails>
+  <what is Value>sravan</what is Value>
+  <what is Value>123</what is Value>
+  <what is Value>
+    <company>MuleSoft</company>
+  </what is Value>
+</EmployeeDetails>
+
+3 -->payload
+[
+ {
+"name" : "Sravan",
+"id" :123,
+"org" : "MuleSoft"
+ },
+ {
+"name" : "Mule",
+"id" :456,
+"org" : "XYZ"
+ },
+ {
+"name" : "Swag",
+"id" :786,
+"org" : "AWS"
+ }
+] 
+
+--> script
+%dw 2.0
+output application/json
+---
+payload reduce ($ ++ $$)
+
+--> output
+{
+  "name": "Swag",
+  "id": 786,
+  "org": "AWS",
+  "name": "Mule",
+  "id": 456,
+  "org": "XYZ",
+  "name": "Sravan",
+  "id": 123,
+  "org": "MuleSoft"
+}
+
+4 --> payload
+
+{
+ "name" : "sravan",
+ "id" :123,
+ "org" : {"company" : "MuleSoft"}
+
+ }
+ 
+ -->script
+ %dw 2.0
+output application/json
+---
+payload pluck (value, key, index) -> {
+
+"what is value" : value
+}
+
+-->output
+[
+  {
+    "what is value": "sravan"
+  },
+  {
+    "what is value": 123
+  },
+  {
+    "what is value": {
+      "company": "MuleSoft"
+    }
+  }
+]
+
+--> runed in transform message
+%dw 2.0
+var a =
+[
+ {
+"name" : "Sravan",
+"id" :123,
+"org" : "MuleSoft"
+ },
+ {
+"name" : "Mule",
+"id" :456,
+"org" : "XYZ"
+ },
+ {
+"name" : "Swag",
+"id" :786,
+"org" : "AWS"
+ }
+]
+var b = [
+ {
+"name" : "BSravan",
+"id" :123,
+"org" : "MuleSoft"
+ },
+ {
+"name" : "BMule",
+"id" :456,
+"org" : "XYZ"
+ },
+ {
+"name" : "BSwag",
+"id" :786,
+"org" : "AWS"
+ }
+] 
+output application/java
+---
+
+flatten(
+a.name + b.id) 
+
+--> output
+In the output we will get name and id values
+
+
+6 --> payload
+
+{
+ "name" : "sravan",
+ "id" :123,
+ "org" : {"company" : "MuleSoft"}
+
+ }
+ 
+ -->script
+ 
+ %dw 2.0
+output application/json
+---
+payload mapObject (value, key, index) -> {
+
+"what is value" : value
+} 
+
+-->output
+
+{
+  "what is value": "sravan",
+  "what is value": 123,
+  "what is value": {
+    "company": "MuleSoft"
+  }
+}
+
+
+7 --> payload
+
+[
+ {
+"name" : "Sravan",
+"id" :123,
+"org" : ["MuleSoft" ,"AWS","microsoft"]
+ },
+ {
+"name" : "Mule",
+"id" :456,
+"org" : ["erf" ,"XYZ"]
+ },
+ {
+"name" : "Swag",
+"id" :786,
+"org" : ["WSD" ,"AWS"]
+ }
+] 
+
+--> script
+
+%dw 2.0
+output application/json
+---
+payload map ((value, index) -> {
+"CanididateName" : upper(value.name),
+"Company" : value.org map ( $ ++ "-" ++ value.name),
+"what is dollar dollar" : index
+}) 
+
+-->output
+
+[
+  {
+    "CanididateName": "SRAVAN",
+    "Company": [
+      "MuleSoft-Sravan",
+      "AWS-Sravan",
+      "microsoft-Sravan"
+    ],
+    "what is dollar dollar": 0
+  },
+  {
+    "CanididateName": "MULE",
+    "Company": [
+      "erf-Mule",
+      "XYZ-Mule"
+    ],
+    "what is dollar dollar": 1
+  },
+  {
+    "CanididateName": "SWAG",
+    "Company": [
+      "WSD-Swag",
+      "AWS-Swag"
+    ],
+    "what is dollar dollar": 2
+  }
+]
