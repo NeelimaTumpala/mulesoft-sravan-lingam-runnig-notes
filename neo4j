@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:neo4j="http://www.mulesoft.org/schema/mule/neo4j" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/neo4j http://www.mulesoft.org/schema/mule/neo4j/current/mule-neo4j.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7d6903e5-7a44-45d8-915b-75b27687bee5" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<neo4j:config name="Neo4j_Config" doc:name="Neo4j Config" doc:id="b4f543e3-d359-4062-9781-33c0533916fc" >
+		<neo4j:connection username="neo4j" password="Neelima@123" boltUrl="bolt://localhost:7687" restUrl="http://localhost:7474" />
+	</neo4j:config>
+	<flow name="deleteFlow" doc:id="40af5c59-e94b-48a0-96b6-65eb99030501" >
+		<http:listener doc:name="Listener" doc:id="1bee41aa-49eb-486f-b9c3-ab3c24111c3f" config-ref="HTTP_Listener_config" path="/delete"/>
+		<neo4j:delete-nodes doc:name="Delete nodes" doc:id="9ccd0725-7e14-493c-a08a-1151b70cb4d0" config-ref="Neo4j_Config" label="Person" removeRelationships="true"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c2072b54-299f-4809-81c5-9eda41d9038b" />
+	</flow>
+	<flow name="CRUD" doc:id="67ff6143-43ae-4afd-9072-659724432dd3" >
+		<http:listener doc:name="Listener" doc:id="466ae1b0-c163-4f6a-afe0-c7b8b42d2686" config-ref="HTTP_Listener_config" path="/neo4j"/>
+		<ee:transform doc:name="Transform Message" doc:id="27080711-525d-4456-a867-605300f2de0b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"name" : "John Dom",
+	"born" : "1965"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<neo4j:create-node label="Person" doc:name="Create node" doc:id="d07feb45-f723-495e-acf6-7dd0503d20ef" config-ref="Neo4j_Config">
+			<neo4j:input ><![CDATA[#[payload]]]></neo4j:input>
+		</neo4j:create-node>
+		<logger level="INFO" doc:name="Logger" doc:id="70569723-d8dd-4228-87f9-38704353f19a" message="Node created"/>
+		<neo4j:select-nodes label="Person" doc:name="Select nodes" doc:id="3800e709-bac1-4948-88a5-126b57b6776c" config-ref="Neo4j_Config">
+			<neo4j:input ><![CDATA[#[payload]]]></neo4j:input>
+		</neo4j:select-nodes>
+		<logger level="INFO" doc:name="Logger" doc:id="9689f161-21c6-40cf-a772-ad3c4f35de5c" message="selected node - #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="6cfa44c9-8b77-4f1c-957d-a767bf6e1419" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="executeFlow2" doc:id="8743203c-d470-46f8-bb5d-c3fcda27824a" >
+		<http:listener doc:name="Listener" doc:id="2b65c686-70c0-49c8-b12b-9886af711c5b" config-ref="HTTP_Listener_config" path="/ee"/>
+		<ee:transform doc:name="Transform Message" doc:id="0c111443-3be1-4756-a075-b87d1c45dd4a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="create" ><![CDATA[%dw 2.0
+output application/java
+---
+"CREATE (a:ACTOR:PERSON { name:\"Tom Hanks\", born:1956 })"]]></ee:set-variable>
+				<ee:set-variable variableName="select" ><![CDATA[%dw 2.0
+output application/java
+---
+"MATCH (a:ACTOR:PERSON) RETURN a"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<neo4j:execute doc:name="Execute" doc:id="39430ea2-0d27-409b-85f5-4e09aec32410" config-ref="Neo4j_Config" query="#[vars.create]"/>
+		<neo4j:execute doc:name="Execute" doc:id="f79516de-ec7b-493c-b414-fe6ceaa5f719" config-ref="Neo4j_Config" query="#[vars.select]"/>
+		<ee:transform doc:name="Transform Message" doc:id="243f8ba5-0771-4a7a-9424-f76d094b315d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
