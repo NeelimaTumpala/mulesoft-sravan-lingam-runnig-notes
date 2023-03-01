@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c88fae54-8263-4231-9afa-9a8842edbb03" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="c4e90251-2a5c-4eb7-9d00-e361c6942ef0" />
+	<flow name="variables-session4Flow" doc:id="4e5124f1-c2d6-4307-9cfd-5fd0b1894795" >
+		<http:listener doc:name="Listener" doc:id="cfa69b4e-c6f0-4805-8862-df94ef0f9877" config-ref="HTTP_Listener_config" path="/test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="03618bb5-8682-48a3-bbcb-774b71924b6d" message="Before setting varibles"/>
+		<set-variable value="#[attributes.queryParams.name]" doc:name="Set Variable" doc:id="433586dc-fbd0-4e6c-99c2-ab4464e5cb6f" variableName="name"/>
+		<set-variable value="#[attributes.method]" doc:name="Set Variable" doc:id="c0f3ca66-8318-4902-a292-c87b1196733c" variableName="method"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1aa6f935-430b-4574-b242-e01cc17cb10a" message="Afore setting varibles"/>
+		<file:read doc:name="Read" doc:id="405ba17a-4e49-42dc-be6a-eb54b37f1a1f" config-ref="File_Config" path="C:\16August\variables-session4\mule-artifact.json"/>
+		<set-payload doc:name="Set Payload" doc:id="4548df8c-8870-4b08-b6d0-4495e259c44f" value='#["Hi..." ++ vars.name as String ++ " your method is " ++ vars.method]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="009df658-b26b-4200-b7df-d7d621f88283" message="Successful...."/>
+	</flow>
+</mule>
