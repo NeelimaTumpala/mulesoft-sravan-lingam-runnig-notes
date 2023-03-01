@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="new-sprint2Flow" doc:id="daaea9f5-d441-4aa4-ac1e-af16921006e6" >
+		<batch:job jobName="new-sprint2Batch_Job" doc:id="311fd65e-5c9e-4e56-aa34-d18aa4e18cbc" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="ac0bb905-c99a-4848-87d4-8225017772a1" >
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="5c63ba71-16dc-47e8-b6bf-52250dedd1d3" />
+				</batch:step>
+			</batch:process-records>
+		</batch:job>
+	</flow>
+	<flow name="new-sprint2Flow1" doc:id="6fe5b021-64a2-4702-a611-c3a9ffa6da82" >
+		<ee:transform doc:name="Transform Message" doc:id="54ce9a44-da05-4e8c-afe2-e787f7f4261e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{"a":"b","c":"d"} pluck (value,key,index) -> { (index) : { (value):key} }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
