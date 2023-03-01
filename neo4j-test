@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:neo4j="http://www.mulesoft.org/schema/mule/neo4j" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/neo4j http://www.mulesoft.org/schema/mule/neo4j/current/mule-neo4j.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4d975aa2-2bd4-425c-be2d-62bb8fe5a685" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<neo4j:config name="Neo4j_Config" doc:name="Neo4j Config" doc:id="61e9686a-581d-4a33-9937-ca0e98f8eff3" >
+		<neo4j:connection username="neo4j" password="Neelima@123" boltUrl="bolt://localhost:7687" restUrl="http://localhost:7474"/>
+	</neo4j:config>
+	<flow name="neo4j-testFlow" doc:id="f01e6242-fcc1-459d-859e-8a83fd074879" >
+		<http:listener doc:name="Listener" doc:id="09716b27-7c82-4361-83f0-8cfe05b435b6" config-ref="HTTP_Listener_config" path="/crud"/>
+		<neo4j:create-node doc:name="Create node" doc:id="b77bbf4f-b0cd-4df2-ba2e-a0b6a8b829a7" config-ref="Neo4j_Config"/>
+	</flow>
+</mule>
