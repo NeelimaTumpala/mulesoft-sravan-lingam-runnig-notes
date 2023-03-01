@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ad7360d9-2b2d-4572-a39a-ef489d74fbb8" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="choice-session6Flow" doc:id="ea3f9698-0bbe-4e3a-b373-a0fe55e47f6e" >
+		<http:listener doc:name="Listener" doc:id="254f2d66-c2de-4d6f-89b9-de032248fe85" config-ref="HTTP_Listener_config" path="/test"/>
+		<set-payload value='#["London"]' doc:name="Set Payload" doc:id="246f42e5-c35c-42f1-b6e8-75fd0903d660" />
+		<choice doc:name="Choice" doc:id="4c8d91b1-486f-4095-83a2-123dfbcebb7c" >
+			<when expression='#[(payload.city default " ") == "London"]'>
+				<ee:transform doc:name="Transform Message" doc:id="efe71672-4e78-4ad8-a5da-cbdc96e45011" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"You are in London"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="3c60cfd5-3044-47f2-96ed-0c0448d8745d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"You are out of London..."]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
