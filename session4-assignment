@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7b829e2f-30f1-4318-b360-b7424b456141" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="session4-assignmentFlow" doc:id="d4f248f0-1d02-46d7-97eb-fd02ffeef2a6" >
+		<http:listener doc:name="Listener" doc:id="8b84630d-9624-4374-a818-e8ab95a73907" config-ref="HTTP_Listener_config" path="/demoClass4"/>
+		<set-variable value="#[attributes.name]" doc:name="name" doc:id="550f5f11-b108-482f-8c1e-fec1543705fb" variableName="name"/>
+		<set-variable value="#[attributes.role]" doc:name="role" doc:id="0087227a-6f8e-445a-8f08-00db7f51efe4" variableName="role"/>
+		<set-variable value="#[attributes.queryParams.company]" doc:name="company" doc:id="ebde5d1c-c234-41ac-b0af-3790a287145d" variableName="company"/>
+		<flow-ref doc:name="Flow Reference" doc:id="94cdaab6-2ae6-400e-a77b-2eb3f4734b5a" name="session4-assignmentFlow1"/>
+	</flow>
+	<flow name="session4-assignmentFlow1" doc:id="a15ac5fd-7d4a-4fe9-8786-6f728a909a34" >
+		<ee:transform doc:name="Transform Message" doc:id="b0a2f50f-b2f2-404e-9132-9b2068881356">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+p('message1') ++ " : " ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3aebe42a-de46-4a43-9ca4-789056c52567" message="#[payload]" />
+	</flow>
+</mule>
