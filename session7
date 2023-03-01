@@ -1,0 +1,94 @@
+-->session7
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="434b81d0-2b31-4a44-bee7-169a92ab35d3" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="bc417e30-9f45-4bbc-bbf1-c3cd63d13738" >
+		<db:generic-connection url="jdbc:postgresql://localhost:5432/mule" driverClassName="org.postgresql.Driver" user="postgres" password="neelu" />
+	</db:config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="45946613-b32b-4f34-aec1-d9d0251886d8" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="9517809e-2732-4842-8fc2-43849601ba3c" >
+		<salesforce:basic-connection username="neelima.a.tumpala@capgemini.com" password="Neelima@123" securityToken="vhSBTC3o37KAFXVvUYYjcnxC" url="https://login.salesforce.com/services/Soap/u/55.0"/>
+	</salesforce:sfdc-config>
+	<flow name="session7Flow" doc:id="4ba248f2-d910-4142-bf6a-3b8837da139c" >
+		<http:listener doc:name="Listener" doc:id="f0c7889d-0432-497c-8300-331c2ef95e3d" config-ref="HTTP_Listener_config" path="/postgresql"/>
+		<db:select doc:name="Select" doc:id="64869332-2a73-422a-8fc9-1e3bdeeb7b1d" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM public."Bankdetails" where custname=:name and accno=:accno;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	name : attributes.queryParams.name,
+	accno : attributes.queryParams.accno
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="690aaceb-9d6d-4163-9abb-4be4649ce7a4" >
+			<when expression="#[sizeOf(payload) &gt; 0]">
+				<ee:transform doc:name="Transform Message" doc:id="cd3b516d-e969-4dba-a37f-a655afed2e8f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<file:write doc:name="Write" doc:id="704a084b-1abc-4c40-bf91-8b16514aca96" config-ref="File_Config" path="C:\Users\NETUMPAL\Desktop\MuleSoft certification\dummyFolder.txt" mode="APPEND"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="b55a9352-81ca-4fde-af60-0f405eab706f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "No record found..."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="12bbea63-d79f-430e-9de2-179018a06ad1" message="Flow completed..."/>
+	</flow>
+	<flow name="session7Flow1" doc:id="60a19d6a-2c37-42ed-b8d4-372fd1f96685" >
+		<http:listener doc:name="Listener" doc:id="5877a945-7586-40fc-9565-0142dd2525a1" config-ref="HTTP_Listener_config" path="/sf"/>
+		<ee:transform doc:name="Transform Message" doc:id="35784ff4-9f8a-499d-9c32-2d2761594713" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="092db8c0-83ee-4d6e-a7aa-6c018777f136" config-ref="Salesforce_Config" type="Account"/>
+		<ee:transform doc:name="Transform Message" doc:id="f1ca8694-aa3a-4c51-82b2-e9d542d2605b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
+
+
+--->session7-config
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="session7-configFlow" doc:id="8fd4d5f8-c670-4ff6-a60c-94d956a765f0" >
+		<db:select doc:name="Select" doc:id="644b1313-1e44-4c5d-8e33-e9b91e69e78e" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM public."Bankdetails";]]></db:sql>
+		</db:select>
+	</flow>
+</mule>
