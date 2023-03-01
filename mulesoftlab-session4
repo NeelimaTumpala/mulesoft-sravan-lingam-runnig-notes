@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="76611dfc-a77c-4925-bd3a-7d590f56e6ed" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mulesoftab-session4Flow" doc:id="0c7cb1ea-c1bd-42bd-a3d7-5c538552d475" >
+		<http:listener doc:name="Listener" doc:id="803c0203-5a0e-4c69-b17f-eaee22cf87bc" config-ref="HTTP_Listener_config" path="/test"/>
+		<flow-ref doc:name="Flow Reference" doc:id="d2ed111b-c20d-4ff3-9b5b-873642a87a57" name="mulesoftab-session4Sub_Flow"/>
+		<set-payload value='#["Hi..." ++ attributes.queryParams.name as String ++ " your method is " ++ attributes.method]' doc:name="Set Payload" doc:id="7820d81a-dbd3-42fa-afea-2d14b300ffed" />
+	</flow>
+	<flow name="mulesoftab-session4Flow1-private-flow" doc:id="239481b1-86ec-40b2-816b-81e24b8b0138" >
+		<set-payload value='#["You are inside a private flow..."]' doc:name="Private flow" doc:id="b9bb3b03-aefe-4f62-92b5-a14e2cd5aff0" />
+	</flow>
+	<sub-flow name="mulesoftab-session4Sub_Flow" doc:id="e3c058ee-e772-4701-920b-7df27c904ad2" >
+		<set-payload value='#["You are inside a sub flow..."]' doc:name="Sub Flow" doc:id="b949da9f-9f79-4aa2-9654-d047c27222b2" />
+	</sub-flow>
+</mule>
