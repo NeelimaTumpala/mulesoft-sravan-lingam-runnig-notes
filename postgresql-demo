@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5dd2db51-7393-467a-8711-717a7692dc48" basePath="api" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="d3a0336a-d819-4f39-8343-78d4ebf7c3a8" >
+		<db:generic-connection url="jdbc:postgresql://localhost:5432/mule" driverClassName="org.postgresql.Driver" user="postgres" password="neelu"/>
+	</db:config>
+	<flow name="postgresql-demoFlow" doc:id="e221e5ae-4b7d-4e65-b2b6-8174aa56391b" >
+		<http:listener doc:name="Listener" doc:id="adaac045-b6a8-4291-829c-a8dac3fa990b" config-ref="HTTP_Listener_config" path="/postgresql"/>
+		<db:select doc:name="Select" doc:id="f9467822-5128-4c97-ac13-b0004aa6ea3f" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM public."Bankdetails";]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="211ccb24-1136-4dbe-b0dd-6676163d63ed" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
