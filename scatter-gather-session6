@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f1479e13-1ddb-419c-ae57-830e5dd9ef36" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="scatter-gather-session6Flow" doc:id="23806483-8e7e-4dcb-8c10-4016b15788a5" >
+		<http:listener doc:name="Listener" doc:id="afc60a1e-9b5d-4770-af03-98aa8f5cb0c5" config-ref="HTTP_Listener_config" path="/test"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="7a4ed317-41a9-40a5-a3e2-f69278d91e0d" />
+		<scatter-gather doc:name="Scatter-Gather" doc:id="7334c353-9301-4dc8-a257-74b03a1849eb" >
+			<route >
+				<ee:transform doc:name="Transform Message" doc:id="18651b76-86ff-4b2b-b66f-79b6f397b684" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"First target " ++ payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+			<route>
+				<try doc:name="Try" doc:id="2c4597ab-9162-42dd-b0c4-4353e430da9b" >
+					<ee:transform doc:name="Transform Message" doc:id="31750e79-fe85-496b-bb33-b7dd8afd72b2">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+2/0]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8fe80f09-68d5-4146-8047-7e75a9dcfda9" />
+					</error-handler>
+				</try>
+			</route>
+			<route >
+				<ee:transform doc:name="Transform Message" doc:id="5cb30c5c-df11-44dc-9256-e3ea35a2caa5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Third target " ++ payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="d6808cf4-731c-45b0-8128-93c4c2e9d4b9">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload[0].payload ++ payload[1].payload ++ payload[2].payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+	</flow>
+</mule>
