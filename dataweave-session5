@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a4f71e32-cc21-44ba-8385-edc41787b5c5" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dataweave-session5Flow" doc:id="c8882602-ab78-4b08-8873-68fcf6870277" >
+		<http:listener doc:name="Listener" doc:id="c17d01a4-20ab-49ea-8847-4e26cf2fbaad" config-ref="HTTP_Listener_config" path="/test"/>
+		<ee:transform doc:name="Transform Message" doc:id="c9a8d398-c1b6-470e-a106-2f9f24f505d7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+output application/json
+---
+
+"Hi " ++ payload.name ++ " you are working for " ++ attributes.queryParams.org
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dataweave-session5Flow1" doc:id="7bb14ac2-2f69-4b3b-a1c0-d9e1e91c1269" >
+		<http:listener doc:name="Listener" doc:id="afe4f634-f5dd-4b22-b0f3-98910fa8c22e" config-ref="HTTP_Listener_config" path="/dataweave"/>
+		<ee:transform doc:name="Transform Message" doc:id="c2b6b672-0d09-474b-aa94-acb4321515e5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : Mule::lookup("dataweave-session5Flow2","How are you...")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dataweave-session5Flow2" doc:id="98bf88cd-21f8-430a-9047-2d69c1ce20c4" >
+		<ee:transform doc:name="private flow" doc:id="17e54315-7302-4a21-8edb-a7e143c70d09" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Hi Neelima " ++ payload as String]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
