@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="83e6c993-52a2-4e7d-8065-f8c28af0b377" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="validation-session6Flow" doc:id="f2d32a26-8d51-4319-92a4-88593a9ed975" >
+		<http:listener doc:name="Listener" doc:id="0a161e21-d351-478c-9102-339d6e534ca5" config-ref="HTTP_Listener_config" path="/test"/>
+		<set-payload value='#[payload]' doc:name="Set Payload" doc:id="b1be2398-bdf8-49ed-9543-7e95b1a78a23" />
+		<validation:is-not-null doc:name="Is not null" doc:id="92df9b75-61c7-448c-9d88-707215a3a2e1" value="#[payload]" message="The payload is null...Please enter payload"/>
+		<ee:transform doc:name="Transform Message" doc:id="fe23bd56-e636-45c9-b223-54b7f4741336">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+if(payload.city=="London") "you are inside london" else "you are outside London"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
